@@ -80,6 +80,28 @@ const PetController = {
       res.status(500).send({ message: "Error retrieving pet information." });
     }
   },
+  async addMedication(req, res) {
+    try {
+      const pet = await Pet.findById(req.params.id);
+      pet.medications.push(req.body);
+      await pet.save();
+      res.send({ message: "Medication added successfully", pet });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Error adding medication.", error });
+    }
+  },
+  async addWalk(req, res) {
+    try {
+      const pet = await Pet.findById(req.params.id);
+      pet.walks.push(req.body);
+      await pet.save();
+      res.send({ message: "Walk added successfully", pet });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Error adding walk.", error });
+    }
+  }
 };
 
 module.exports = PetController;

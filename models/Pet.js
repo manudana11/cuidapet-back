@@ -18,13 +18,20 @@ const PetSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  owner: {
+  ownerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
+  noteIds: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Note',
+  },
   vaccinations: [{
-    vaccine: String,
+    medications: [{
+      type: mongoose.Schema.Types.ObjectId, //Añadir en medications el campo 'type'
+      ref: 'Medication'
+    }],
     date: Date,
     completed: Boolean
   }],
@@ -32,9 +39,23 @@ const PetSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  lastFed: {
-    type: Date
-  }
+  lastFed: Date,
+  petMedicationsId: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PetMedications'
+  }],
+  petFoodId: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PetFood'
+  }],
+  walkIds: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Walk'
+  }],
+  documentIds: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Document'
+  }]
 });
 
 const Pet = mongoose.model('Pet', PetSchema);
