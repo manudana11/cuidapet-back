@@ -35,6 +35,10 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Wallet',
   },
+  notificationsIds: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Notification',
+  },
   dateOfBirth: {
     type: Date,
     required: [true, "Please complete the 'date of birth' field"],
