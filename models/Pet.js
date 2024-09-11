@@ -56,7 +56,7 @@ const PetSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Document'
   }]
-});
+}, { timestamps: true });
 
 const Pet = mongoose.model('Pet', PetSchema);
 

@@ -18,7 +18,7 @@ const DocumentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-});
+}, { timestamps: true });
 
 const Document = mongoose.model('Document', DocumentSchema);
 
