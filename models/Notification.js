@@ -1,24 +1,29 @@
 const mongoose = require('mongoose');
 
 const NotificationSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     petsId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Pet',
         required: true
     },
-    speed: {
+    type: {
         type: String,
         required: true
     },
-    route: {
+    message: {
         type: String,
         required: true
     },
-    rating: {
+    status: {
         type: String,
         required: true
     },
-    walkPic: String,
+    isRead: Boolean,
 }, { timestamps: true });
 
 const Notification = mongoose.model('Notification', NotificationSchema);

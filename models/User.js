@@ -31,6 +31,21 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please complete the address field"],
   },
+  dateOfBirth: {
+    type: Date,
+    required: [true, "Please complete the 'date of birth' field"],
+  },
+  profilePic: String,
+  pets: [{ type: ObjectId, ref: 'Post' }],
+  tokens: [],
+  role: {
+    type: String,
+    default: 'user'
+  },
+  confirmed: {
+    type: Boolean,
+    default: false
+  },
   walletId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Wallet',
@@ -39,18 +54,6 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Notification',
   },
-  dateOfBirth: {
-    type: Date,
-    required: [true, "Please complete the 'date of birth' field"],
-  },
-  profilePic: String,
-  pets: [{ type: ObjectId, ref: 'Post' }],
-  tokens: [],
-  role: String,
-  confirmed: {
-    type: Boolean,
-    default: false
-  }
 }, { timestamps: true });
 
 UserSchema.methods.toJSON = function () {
