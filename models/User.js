@@ -36,7 +36,10 @@ const UserSchema = new mongoose.Schema({
     required: [true, "Please complete the 'date of birth' field"],
   },
   profilePic: String,
-  pets: [{ type: ObjectId, ref: 'Post' }],
+  pets: [{ 
+    type: ObjectId, 
+    ref: 'Post' 
+  }],
   tokens: [],
   role: {
     type: String,

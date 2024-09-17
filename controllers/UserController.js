@@ -48,25 +48,23 @@ const UserController = {
     },
     async getAll(req, res) {
         try {
-            const { page = 1, limit = 10 } = req.query
+            const { page = 1, limit = 10 } = req.query;
             const users = await User.find()
-                .populate("posts.postId")
                 .limit(limit)
                 .skip((page - 1) * limit);
-            res.send({ message: 'Users', users })
+            res.send({ message: 'Users', users });
         } catch (error) {
-            console.error(error)
-            res.status(500).send({ message: 'There´s been a problem searching all the users' })
+            console.error(error);
+            res.status(500).send({ message: "There´s been a problem searching all the users" });
         }
     },
     async userData(req, res) {
         try {
-            const userData = await User.findById(req.user._id).populate({ path: "followers", select: "userName" })
-            .populate ("posts").populate ({path: "following", select: "userName"})
-            res.send({ message: 'Your information:', userData })
+            const userData = await User.findById(req.user._id);
+            res.send({ message: 'Your information:', userData });
         } catch (error) {
-            console.error(error)
-            res.status(400).send({ message: 'You must be logged to see your information' })
+            console.error(error);
+            res.status(400).send({ message: 'You must be logged to see your information' });
         }
     },
     async getById(req, res) {
@@ -129,24 +127,24 @@ const UserController = {
     },
     async update(req, res) {
         try {
-            if (!req.file) {
-                const update = { ...req.body, password: req.user.password, role: req.user.role }
-                const user = await User.findByIdAndUpdate(
-                    req.user._id,
-                    update,
-                    { new: true }
-                )
-                res.send({ message: "user successfully updated", user });;
+            const userToUpdate = await User.findById(req.user._id)
+            const updateData = { ...req.body, role: "user", email: userToUpdate.email, userName: userToUpdate.userName };
+
+            if (req.body.password) {
+                updateData.password = bcrypt.hashSync(req.body.password, 10);
             } else {
-                const profilePic = req.file.path;
-                const update = { ...req.body, password: req.user.password, role: req.user.role, profilePic }
-                const user = await User.findByIdAndUpdate(
-                    req.user._id,
-                    update,
-                    { new: true }
-                );
-                res.send({ message: "user successfully updated", user });
+                updateData.password = req.user.password;
             }
+
+            if (req.file) {
+                updateData.profilePic = req.file.path;
+            }
+
+            const user = await User.findByIdAndUpdate(req.user._id, updateData, { new: true });
+            if (!user) {
+                return res.status(404).send({ message: "User not found" });
+            }
+            res.send({ message: "User updated successfully", user });
         } catch (error) {
             console.error(error);
         }
@@ -192,6 +190,9 @@ const UserController = {
                 { email: req.params.email },
                 { confirmed: true },
                 { new: true });
+            if (!user) {
+                return res.status(404).send({ message: "User not found" });
+            }
             res.status(201).send({ message: "User confirmed successfully", user });
         } catch (error) {
             console.error(error)
@@ -199,15 +200,16 @@ const UserController = {
     },
     async delete(req, res) {
         try {
-          const post = await User.findByIdAndDelete(req.user._id);
-          // Comments
-          // Posts
-          res.send({ message: "Deleted user with all his posts and comments", post });
+            const user = await User.findByIdAndDelete(req.user._id);
+            if (!user) {
+                return res.status(404).send({ message: "User not found" })
+            }
+            res.send({ message: "User deleted", post });
         } catch (error) {
-          console.error(error);
-          res.status(500).send({ message: "There was a problem trying to remove the post" });
+            console.error(error);
+            res.status(500).send({ message: "There was a problem trying to remove the user" });
         }
-      },
+    },
 }
 
 module.exports = UserController;
