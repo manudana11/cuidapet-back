@@ -1,10 +1,11 @@
 const Pet = require("../models/Pet");
 const User = require("../models/User");
+const Walk = require("../models/Walk");
 
 const PetController = {
   async create(req, res) {
     try {
-      const petData = { ...req.body, owner: req.user._id };
+      const petData = { ...req.body, ownerId: req.user._id };
       if (req.file) {
         petData.petPic = req.file.path;
       }
@@ -23,6 +24,9 @@ const PetController = {
   async update(req, res) {
     try {
       const updateData = req.body;
+      if (req.file) {
+        updateData.petPic = req.file.path;
+      }
       const updatedPet = await Pet.findByIdAndUpdate(
         req.params.id,
         updateData,
@@ -50,7 +54,11 @@ const PetController = {
   },
   async getById(req, res) {
     try {
-      const pet = await Pet.findById(req.params.id);
+      const pet = await Pet.findById(req.params.id)
+        .populate({
+          path: "ownerId",
+          select: "name email pets"
+        });
       res.send(pet);
     } catch (error) {
       console.error(error);
@@ -67,19 +75,6 @@ const PetController = {
       res.status(500).send({ message: "Error searching pets by name." });
     }
   },
-  async getInfoByOwner(req, res) {
-    try {
-      const pets = await Pet.find({ owner: req.user._id })
-        .populate({
-          path: "owner",
-          select: "name email"
-        });
-      res.send(pets);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send({ message: "Error retrieving pet information." });
-    }
-  },
   async addMedication(req, res) {
     try {
       const pet = await Pet.findById(req.params.id);
@@ -91,15 +86,42 @@ const PetController = {
       res.status(500).send({ message: "Error adding medication.", error });
     }
   },
-  async addWalk(req, res) {
+  async startWalk(req, res) {
     try {
       const pet = await Pet.findById(req.params.id);
-      pet.walks.push(req.body);
+      if (!pet) {
+        return res.status(404).send({ message: "Pet not found" });
+      }
+      const newWalk = await Walk.create({
+        petsId: pet._id,
+        startDate: new Date(),
+        speed: req.body.speed,
+        rating: req.body.rating
+      });
+      pet.walkIds.push(newWalk._id);
       await pet.save();
-      res.send({ message: "Walk added successfully", pet });
+      res.status(201).send({ message: "Walk started successfully", newWalk });
     } catch (error) {
       console.error(error);
       res.status(500).send({ message: "Error adding walk.", error });
+    }
+  },
+  async endWalk(req, res) {
+    try {
+      const pet = await Pet.findByIdAndUpdate(req.params.id)
+      console.log(pet)
+      const walk = await Walk.findById(req.body.walkIds);
+      if (!walk) {
+        return res.status(404).send({ message: "Walk not found" });
+      }
+      walk.endDate = new Date();
+      walk.rating = req.body.rating;
+      await walk.save();
+
+      res.send({ message: "Walk ended successfully", walk });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Error ending the walk.", error });
     }
   }
 };

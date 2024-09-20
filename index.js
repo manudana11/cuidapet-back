@@ -12,6 +12,8 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/users', require('./routes/users'));
 app.use("/pets", require("./routes/pets"));
+app.use("/medications", require("./routes/medications"));
+app.use("/food", require("./routes/foods"));
 
 app.listen(PORT, ()=> console.log(`Servidor levantado en el puerto ${PORT}`));
 module.exports = app;

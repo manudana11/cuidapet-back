@@ -13,6 +13,10 @@ const FoodSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  ingredients: {
+    type: String,
+    required: true
+  },
   foodPic: String,
 }, { timestamps: true });
 

@@ -15,15 +15,15 @@ const WalkSchema = new mongoose.Schema({
     },
     speed: {
         type: String,
-        required: true
+        required: false
     },
     route: {
         type: Object,
-        required: true
+        required: false
     },
     rating: {
         type: String,
-        required: true
+        required: false
     },
     walkPic: String,
 }, { timestamps: true });
