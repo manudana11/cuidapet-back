@@ -1,6 +1,8 @@
 const Pet = require("../models/Pet");
 const User = require("../models/User");
 const Walk = require("../models/Walk");
+const Document = require("../models/Document");
+const PetFood = require("../models/PetFood");
 
 const PetController = {
   async create(req, res) {
@@ -123,7 +125,52 @@ const PetController = {
       console.error(error);
       res.status(500).send({ message: "Error ending the walk.", error });
     }
-  }
+  },
+  async addDocument(req, res) {
+    try {
+      const pet = await Pet.findById(req.params.id);
+      if (!pet) {
+        return res.status(404).send({ message: "Pet not found" });
+      }
+      if (!req.file) {
+        return res.status(400).send({ message: "No document uploaded" });
+      }
+
+      const newDocument = await Document.create({
+        documentName: req.body.documentName,
+        petId: pet._id,
+        documentFile: req.file.path
+      });
+      pet.documentIds.push(newDocument._id);
+      await pet.save();
+      res.status(201).send({ message: "Document added successfully", newDocument });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Error adding document.", error });
+    }
+  },
+  async addFood(req, res) {
+    try {
+      const pet = await Pet.findById(req.params.id);
+      if (!pet) {
+        return res.status(404).send({ message: "Pet not found" });
+      }
+      const newPetFood = await PetFood.create({
+        petId: pet._id,
+        foodId: req.body.foodId,
+        timesPerDay: req.body.timesPerDay,
+        startDate: req.body.startDate || new Date(),
+        endDate: req.body.endDate || null,
+        hours: req.body.hours
+      });
+      pet.petFoodId.push(newPetFood._id);
+      await pet.save();
+      res.status(201).send({ message: "Food added successfully", newPetFood });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Error adding food to pet", error });
+    }
+  },
 };
 
 module.exports = PetController;

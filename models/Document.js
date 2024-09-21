@@ -12,7 +12,7 @@ const DocumentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: true
+    required: false
   },
   documentFile: {
     type: String,

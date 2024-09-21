@@ -16,14 +16,26 @@ const PetFoodSchema = new mongoose.Schema({
     required: true
   },
   startDate: {
-    type: Date,
-    required: true
+    type: String,
+    required: true,
+    validate: {
+      validator: function (value) {
+        return /^([0-1]\d|2[0-3]):([0-5]\d)$/.test(value);
+      },
+      message: props => `${props.value} no es una hora válida. Debe ser en formato HH:mm.`
+    }
   },
   endDate: {
-    type: Date,
+    type: String,
+    validate: {
+      validator: function (value) {
+        return /^([0-1]\d|2[0-3]):([0-5]\d)$/.test(value);
+      },
+      message: props => `${props.value} no es una hora válida. Debe ser en formato HH:mm.`
+    }
   },
   hours: {
-    type: Object,
+    type: Number,
     required: true
   }
 }, { timestamps: true });
