@@ -25,9 +25,10 @@ const PetMedicationSchema = new mongoose.Schema({
   },
   endDate: {
     type: Date,
+    required: true
   },
   hours: {
-    type: Object, // Guardar las horas en formato JSON
+    type: Object,
     required: true
   },
   prescribedBy: {

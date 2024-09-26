@@ -3,6 +3,8 @@ const User = require("../models/User");
 const Walk = require("../models/Walk");
 const Document = require("../models/Document");
 const PetFood = require("../models/PetFood");
+const Wallet = require("../models/Wallet");
+const PetMedication = require("../models/PetMedication");
 
 const PetController = {
   async create(req, res) {
@@ -171,6 +173,54 @@ const PetController = {
       res.status(500).send({ message: "Error adding food to pet", error });
     }
   },
+  async addMedication(req, res) {
+    try {
+      const pet = await Pet.findById(req.params.id);
+      if (!pet) {
+        return res.status(404).send({ message: "Pet not found" });
+      }
+      const newPetMedication = await PetMedication.create({
+        petId: pet._id,
+        medicationId: req.body.medicationId,
+        dosage: req.body.dosage,
+        frequency: req.body.frequency,
+        startDate: req.body.startDate || new Date(),
+        endDate: req.body.endDate || null,
+        hours: req.body.hours,
+        prescribedBy: req.user._id
+      });
+      pet.petMedicationsId.push(newPetMedication._id);
+      await pet.save();
+      res.status(201).send({ message: "Medication added successfully", newPetMedication });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Error adding medication to pet", error });
+    }
+  },
+  async addExpense(req, res) {
+    try {
+      const { name, description, amount } = req.body;
+      const pet = await Pet.findById(req.params.id);
+      if (!pet) {
+        return res.status(404).send({ message: "Pet not found" });
+      }
+      let wallet = await Wallet.findOne({ userId: req.user._id, petsId: req.params.id });
+      if (!wallet) {
+        wallet = await Wallet.create({
+          userId: req.user._id,
+          petsId: req.params.id,
+          spent: []
+        });
+        await User.findByIdAndUpdate(req.user._id, { walletId: wallet._id });
+      }
+      wallet.spent.push({ name, description, amount });
+      await wallet.save();
+      res.status(201).send({ message: "Expense added successfully", wallet });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Error adding expense.", error });
+    }
+  }
 };
 
 module.exports = PetController;

@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
   profilePic: String,
   pets: [{ 
     type: ObjectId, 
-    ref: 'Post' 
+    ref: 'Pet' 
   }],
   tokens: [],
   role: {

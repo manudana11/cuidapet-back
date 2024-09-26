@@ -60,11 +60,15 @@ const UserController = {
     },
     async userData(req, res) {
         try {
-            const userData = await User.findById(req.user._id);
+            const userData = await User.findById(req.user._id)
+                .populate('pets');
+            if (!userData) {
+                return res.status(404).send({ message: 'User not found' });
+            }
             res.send({ message: 'Your information:', userData });
         } catch (error) {
             console.error(error);
-            res.status(400).send({ message: 'You must be logged to see your information' });
+            res.status(400).send({ message: 'You must be logged to see your information', error });
         }
     },
     async getById(req, res) {

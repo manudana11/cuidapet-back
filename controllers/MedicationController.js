@@ -14,7 +14,15 @@ const MedicationController = {
             res.status(500).send({ message: 'There´s been a problem creating the medication', error })
         }
     },
-
+    async getAll(req, res) {
+        try {
+            const medication = await Medication.find();
+            res.status(200).send({message: 'All medications', medication})
+        } catch (error) {
+            console.error(error)
+            res.status(500).send({ message: 'There´s been a problem creating the medication', error })
+        }
+    },
 }
 
 module.exports = MedicationController;
